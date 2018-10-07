@@ -39,7 +39,7 @@ var service = sources.NewTarballConfig(opts)
 var store = stores.NewS3Config()
 
 if err := tasks.BackupTask(config, service, store); err != nil {
-  log.Printf("an error occured during backup: %v\n", err)
+  log.Printf("an error occurred during backup: %v\n", err)
   return
 }
 ```
@@ -65,7 +65,7 @@ Those configuration variables can be setup by environment, .env files, or when b
 ### Backup and restore
 
 * `SAVE_DIR`: directory to store the temporal backup after creating/retrieving it.`
-* `SCHEDULE_RANDOM_DELAY`: maximum number of seconds (value choosen at random) to wait before starting a task. There is no random delay by default.
+* `SCHEDULE_RANDOM_DELAY`: maximum number of seconds (value chosen at random) to wait before starting a task. There is no random delay by default.
 * `SCHEDULE`: specifies when to start a task. Defaults to `@daily` on backup, `none` on restore. Accepts cron format, like `0 0 * * *`. Set to `none` to disable and perform only one task.
 
 ### Backup only
