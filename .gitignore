@@ -1,0 +1,6 @@
+.env
+test
+build
+vendor
+cmd/go-s3=backup
+.vscode
