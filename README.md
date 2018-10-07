@@ -116,10 +116,11 @@ The credentials are passed using the standard variables:
 
 ## TODO
 
+* [ ] tests, more tests, even more tests
 * [ ] add checksum to backups and check them when restoring
 
 ## License and Copyright
 
-The majority of core code for BackupTask, RestoreTask, sources and Stores is taken from [codestation/go-s3-backup](https://github.com/codestation/go-s3-backup) copyright by Codestation and therefore licensed under the Apache License 2.0. Due to original design and purpose of the code, it couldn't be forked or imported, thus it has been refactored to remove dependency to command line interface, to simplify configuration management and to change some backup behavior. Gogs service has also been removed.
+The core code for BackupTask, RestoreTask, Sources (Services) and Stores is extracted from [codestation/go-s3-backup](https://github.com/codestation/go-s3-backup) copyright by Codestation and licensed under the Apache License 2.0. Due to original design and purpose of the application, it couldn't be forked or imported, thus extracted code has been restructured and refactored to remove the command line interface and its dependencies, to simplify configuration management, to adopt a different naming convention and to change some backup behavior. This has permitted to get backup and restore behaviors with an embedded interface instead of command line. Gogs service has not been imported.
 
 Other part of the code is licensed under the same Apache License 2.0 and copyright by Stephane Busso.
