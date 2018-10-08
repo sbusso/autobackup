@@ -3,16 +3,10 @@ package tasks
 import (
 	"fmt"
 	"log"
-	"math/rand"
-	"os"
-	"os/signal"
 	"path"
-	"syscall"
-	"time"
 
 	"github.com/caarlos0/env"
 	"github.com/joho/godotenv"
-	"github.com/robfig/cron"
 	"github.com/sbusso/autobackup/sources"
 	"github.com/sbusso/autobackup/stores"
 )
@@ -46,18 +40,6 @@ func init() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-}
-
-func ScheduleBackup(c *Config, source sources.Source, store stores.Store) error {
-	return runScheduler(c, func(c *Config) error {
-		return BackupTask(c, source, store)
-	})
-}
-
-func ScheduleRestore(c *Config, source sources.Source, store stores.Store) error {
-	return runScheduler(c, func(c *Config) error {
-		return RestoreTask(c, source, store)
-	})
 }
 
 func BackupTask(c *Config, source sources.Source, store stores.Store) error {
@@ -107,65 +89,6 @@ func RestoreTask(c *Config, source sources.Source, store stores.Store) error {
 	if err = source.Restore(filepath); err != nil {
 		return fmt.Errorf("source restore failed: %v", err)
 	}
-
-	return nil
-}
-
-func runScheduler(c *Config, task task) error {
-	cr := cron.New()
-	schedule := c.Schedule
-
-	if schedule == "" || schedule == "none" {
-		log.Println("Running task directly")
-		return task(c)
-	}
-
-	log.Println("Starting scheduled backup task")
-	timeoutchan := make(chan bool, 1)
-
-	cr.AddFunc(schedule, func() {
-		delay := c.RandomDelay
-		if delay <= 0 {
-			log.Println("Schedule random delay was set to a number <= 0, using 1 as default")
-			delay = 1
-		}
-
-		seconds := rand.Intn(delay)
-
-		// run immediately is no delay is configured
-		if seconds == 0 {
-			if err := task(c); err != nil {
-				log.Printf("Failed to run scheduled task: %v\n", err)
-			}
-			return
-		}
-
-		log.Printf("Waiting for %d seconds before starting scheduled job", seconds)
-
-		select {
-		case <-timeoutchan:
-			log.Println("Random timeout cancelled")
-			break
-		case <-time.After(time.Duration(seconds) * time.Second):
-			log.Println("Running scheduled task")
-
-			if err := task(c); err != nil {
-				log.Println(0, "Failed to run scheduled task: %v\n", err)
-			}
-			break
-		}
-	})
-	cr.Start()
-
-	signalChan := make(chan os.Signal)
-	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
-
-	<-signalChan
-	timeoutchan <- true
-	close(timeoutchan)
-
-	log.Println("Stopping scheduled task")
-	cr.Stop()
 
 	return nil
 }

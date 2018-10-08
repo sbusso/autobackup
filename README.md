@@ -13,8 +13,9 @@ Using an existing recipe:
 ``` go
 import "github.com/sbusso/autobackup"
 
-autobackup.File("products.db")
-
+ab := autobackup.File("products.db")
+... // your application code
+ab.Stop() // gracefully stop backup scheduler
 ```
 
 More advance usage:
@@ -38,10 +39,14 @@ var service = sources.NewTarballConfig(opts)
 
 var store = stores.NewS3Config()
 
-if err := tasks.BackupTask(config, service, store); err != nil {
-  log.Printf("an error occurred during backup: %v\n", err)
-  return
+s, err := tasks.ScheduleBackup(config, source, store)
+if err != nil {
+  return nil, fmt.Errorf("an error occured during backup: %v\n", err)
 }
+
+s.Start()
+... // your application code
+s.Stop()
 ```
 
 ### Supported sources

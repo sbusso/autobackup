@@ -1,7 +1,7 @@
 package autobackup
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/sbusso/autobackup/sources"
 	"github.com/sbusso/autobackup/stores"
@@ -9,7 +9,7 @@ import (
 )
 
 // File recipe to backup only one file
-func File(dbName string) {
+func File(dbName string) (*tasks.Scheduler, error) {
 
 	var config = tasks.NewConfig()
 
@@ -21,8 +21,12 @@ func File(dbName string) {
 
 	var store = stores.NewS3Config()
 
-	if err := tasks.ScheduleBackup(config, source, store); err != nil {
-		log.Printf("an error occured during backup: %v\n", err)
-		return
+	s, err := tasks.ScheduleBackup(config, source, store)
+	if err != nil {
+		return nil, fmt.Errorf("an error occured during backup: %v\n", err)
 	}
+
+	s.Start()
+
+	return s, nil
 }
