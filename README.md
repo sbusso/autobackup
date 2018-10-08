@@ -14,8 +14,7 @@ Using an existing recipe:
 import "github.com/sbusso/autobackup"
 
 ab := autobackup.File("products.db")
-... // your application code
-ab.Stop() // gracefully stop backup scheduler
+defer ab.Stop() // gracefully stop backup scheduler
 ```
 
 More advance usage:
@@ -45,8 +44,7 @@ if err != nil {
 }
 
 s.Start()
-... // your application code
-s.Stop()
+defer.Stop()
 ```
 
 ### Supported sources
