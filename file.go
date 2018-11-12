@@ -19,11 +19,14 @@ func File(dbName string) (*tasks.Scheduler, error) {
 
 	var source = sources.NewTarballConfig(opts)
 
-	var store = stores.NewS3Config()
+	store, err := stores.NewS3Config()
+	if err != nil {
+		return nil, fmt.Errorf("an error occured getting config, backup will not be scheduled: %v\n", err)
+	}
 
 	s, err := tasks.ScheduleBackup(config, source, store)
 	if err != nil {
-		return nil, fmt.Errorf("an error occured during backup: %v\n", err)
+		return nil, fmt.Errorf("an error occured during scheduling backup, backup will not be scheduled: %v\n", err)
 	}
 
 	s.Start()

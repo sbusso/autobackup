@@ -29,13 +29,13 @@ type S3Config struct {
 	retrievedFile   string `env:"RETRIEVED_FILE"`
 }
 
-func NewS3Config() *S3Config {
+func NewS3Config() (*S3Config, error) {
 	cfg := &S3Config{}
 	err := env.Parse(cfg)
 	if err != nil {
-		fmt.Printf("%+v\n", err)
+		return nil, err
 	}
-	return cfg
+	return cfg, nil
 }
 
 func (s *S3Config) newSession() *session.Session {
